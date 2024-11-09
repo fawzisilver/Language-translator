@@ -17,9 +17,26 @@ const Translator = () => {
 	);
 
 	const handleLanguageClick = (type: string) => {
-		console.log("im workin!");
 		setCurrentLangSelected(type);
 		setShowLanguages(!showLanguages);
+	};
+
+	const handleLanguageSelect = (languageCode: string) => {
+		if (currentLangSelected === "from") {
+			setSelectedLanguageFrom(languageCode);
+			console.log(selectedLanguageFrom);
+			console.log(languageCode);
+		} else {
+			setSelectedLanguageTo(languageCode);
+			console.log(languageCode);
+		}
+
+		setShowLanguages(false);
+	};
+
+	const handleSwapLanguages = () => {
+		setSelectedLanguageFrom(selectedLanguageTo);
+		setSelectedLanguageTo(selectedLanguageFrom);
 	};
 
 	return (
@@ -36,14 +53,15 @@ const Translator = () => {
 							onClick={() => handleLanguageClick("from")}
 							className="cursor-pointer font-semibold"
 						>
-							English
+							{languages[selectedLanguageFrom as keyof typeof languages] ||
+								"English"}
 						</div>
-						<IoReload />
+						<IoReload onClick={handleSwapLanguages} />
 						<div
 							onClick={() => handleLanguageClick("to")}
 							className="cursor-pointer font-semibold"
 						>
-							English
+							{languages[selectedLanguageTo as keyof typeof languages] || "English"}
 						</div>
 					</div>
 
@@ -52,6 +70,7 @@ const Translator = () => {
 							<ul>
 								{Object.entries(languages).map(([key, value]) => (
 									<li
+										onClick={() => handleLanguageSelect(key)}
 										key={key}
 										className="text-center cursor-pointer hover:bg-slate-800 hover:text-white transition duration-200 px-10 py-[0.1rem] rounded"
 									>

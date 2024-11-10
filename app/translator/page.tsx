@@ -6,7 +6,6 @@ import { IoReload } from "react-icons/io5";
 import { CiCircleChevDown } from "react-icons/ci";
 import Link from "next/link";
 import { languages } from "@/dataset/languagesData.js";
-import { TextArea } from "@/component/TextArea";
 
 const Translator = () => {
 	const [selectedLanguageFrom, setSelectedLanguageFrom] = useState<string>("en");
@@ -15,6 +14,10 @@ const Translator = () => {
 	const [currentLangSelected, setCurrentLangSelected] = useState<string | null>(
 		null
 	);
+	const [inputText, setInputText] = useState<string>("");
+	const [translated, setTranslated] = useState<string>("");
+	const [characterCount, setCharacterCount] = useState<number>(0);
+	const maxChars = 200;
 
 	const handleLanguageClick = (type: string) => {
 		setCurrentLangSelected(type);
@@ -24,11 +27,8 @@ const Translator = () => {
 	const handleLanguageSelect = (languageCode: string) => {
 		if (currentLangSelected === "from") {
 			setSelectedLanguageFrom(languageCode);
-			console.log(selectedLanguageFrom);
-			console.log(languageCode);
 		} else {
 			setSelectedLanguageTo(languageCode);
-			console.log(languageCode);
 		}
 
 		setShowLanguages(false);
@@ -37,6 +37,32 @@ const Translator = () => {
 	const handleSwapLanguages = () => {
 		setSelectedLanguageFrom(selectedLanguageTo);
 		setSelectedLanguageTo(selectedLanguageFrom);
+	};
+
+	const handleTranslate = async () => {
+		if (!inputText.trim()) {
+			setTranslated("");
+			return;
+		}
+
+		// https://api.mymemory.translated.net/get?q=Hello World!&langpair=en|it (hard-coded url)
+		const response = await fetch(
+			`https://api.mymemory.translated.net/get?q=${encodeURIComponent(
+				inputText
+			)}&langpair=${selectedLanguageFrom}|${selectedLanguageTo}`
+		);
+
+		const data = await response.json();
+
+		setTranslated(data.responseData.translatedText); // based on api method
+	};
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		const value = e.target.value;
+		if (value.length <= maxChars) {
+			setInputText(value);
+			setCharacterCount(value.length);
+		}
 	};
 
 	return (
@@ -82,16 +108,29 @@ const Translator = () => {
 					)}
 
 					<div className="w-full flex justify-center relative">
-						<textarea className="w-[28rem] h-44 shadow-md rounded-lg px-5 py-2" />
-						<div className="absolute bottom-1 right-11 text-xs">0/200</div>
+						<textarea
+							onChange={handleInputChange}
+							className="w-[28rem] h-44 shadow-md rounded-lg px-5 py-2"
+							value={inputText || ""}
+						/>
+						<div className="absolute bottom-1 right-11 text-xs">
+							{characterCount}/200
+						</div>
 					</div>
 					<div className="w-full flex justify-center py-2">
 						<button>
-							<CiCircleChevDown style={{ height: "25px", width: "25px" }} />
+							<CiCircleChevDown
+								onClick={handleTranslate}
+								style={{ height: "25px", width: "25px" }}
+							/>
 						</button>
 					</div>
 					<div className="w-full">
-						<textarea className="w-[28rem] flex justify-center h-44 shadow-md rounded-lg px-5 py-2" />
+						<textarea
+							readOnly
+							value={translated || ""}
+							className="w-[28rem] flex justify-center h-44 shadow-md rounded-lg px-5 py-2"
+						/>
 					</div>
 				</div>
 			</div>

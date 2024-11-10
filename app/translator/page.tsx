@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import React from "react";
 import { FaRegRectangleXmark } from "react-icons/fa6";
 import { IoReload } from "react-icons/io5";
@@ -18,6 +18,7 @@ const Translator = () => {
 	const [translated, setTranslated] = useState<string>("");
 	const [characterCount, setCharacterCount] = useState<number>(0);
 	const maxChars = 200;
+	const dropDownRef = useRef<HTMLDivElement>(null);
 
 	const handleLanguageClick = (type: string) => {
 		setCurrentLangSelected(type);
@@ -64,6 +65,31 @@ const Translator = () => {
 			setCharacterCount(value.length);
 		}
 	};
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			handleTranslate();
+		}
+	};
+
+	const handleClickOut = (e: MouseEvent) => {
+		if (dropDownRef.current && !dropDownRef.current.contains(e.target as Node)) {
+			setShowLanguages(false);
+		}
+	};
+
+	useEffect(() => {
+		if (showLanguages) {
+			document.addEventListener("mousedown", handleClickOut);
+		} else if (!showLanguages) {
+			document.removeEventListener("mousedown", handleClickOut);
+		}
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOut);
+		};
+	}, [showLanguages]);
 
 	return (
 		<main className="w-full h-screen flex justify-center items-center m-4">
@@ -112,9 +138,10 @@ const Translator = () => {
 							onChange={handleInputChange}
 							className="w-[28rem] h-44 shadow-md rounded-lg px-5 py-2"
 							value={inputText || ""}
+							onKeyDown={handleKeyDown}
 						/>
 						<div className="absolute bottom-1 right-11 text-xs">
-							{characterCount}/200
+							{characterCount}/{maxChars}
 						</div>
 					</div>
 					<div className="w-full flex justify-center py-2">

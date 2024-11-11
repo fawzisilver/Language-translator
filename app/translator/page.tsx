@@ -93,32 +93,38 @@ const Translator = () => {
 
 	return (
 		<main className="w-full h-screen flex justify-center items-center m-4">
-			<div className="min-w-fit min-h-[569px] flex flex-col justify-center items-center py-12 px-4 bg-[#f5f5f5] rounded relative">
+			<div className="min-w-fit min-h-[569px] flex flex-col justify-center items-center py-12 px-4 bg-[#f5f5f5] rounded relative shadow-2xl">
 				<div className="gap-y-4 items-center  bg-[#f5f5f5]">
 					<Link href="/">
 						<button className="absolute top-4 left-4 text-gray-700">
-							<FaRegRectangleXmark />
+							<FaRegRectangleXmark className="hover:scale-110" />
 						</button>
 					</Link>
 					<div className="w-[28rem] min-h-16 flex gap-10 justify-center items-center mb-4 text-gray-700 bg-[#cc9767] font-medium rounded-md shadow-md">
 						<div
 							onClick={() => handleLanguageClick("from")}
-							className="cursor-pointer font-semibold"
+							className="relative cursor-pointer font-semibold hover:before:w-full before:absolute before:bottom-0 before:left-0 before:h-[2px] before:w-0 before:bg-slate-700 before:transition-all before:duration-200"
 						>
 							{languages[selectedLanguageFrom as keyof typeof languages] ||
 								"English"}
 						</div>
-						<IoReload onClick={handleSwapLanguages} />
+						<IoReload
+							onClick={handleSwapLanguages}
+							className="cursor-pointer hover:scale-110 hover:rotate-[360deg] duration-700"
+						/>
 						<div
 							onClick={() => handleLanguageClick("to")}
-							className="cursor-pointer font-semibold"
+							className="relative cursor-pointer font-semibold hover:before:w-full before:absolute before:bottom-0 before:left-0 before:h-[2px] before:w-0 before:bg-slate-700 before:transition-all before:duration-200"
 						>
 							{languages[selectedLanguageTo as keyof typeof languages] || "English"}
 						</div>
 					</div>
 
 					{showLanguages && (
-						<div className="w-[93.5%] h-[calc(100%-8rem)] bg-[#fff0db] absolute top-[7rem] z-10 rounded shadow-lg overflow-y-auto">
+						<div
+							ref={dropDownRef}
+							className="w-[93.5%] h-[calc(100%-8rem)] bg-[#fff0db] absolute top-[7rem] z-10 rounded shadow-lg overflow-y-auto"
+						>
 							<ul>
 								{Object.entries(languages).map(([key, value]) => (
 									<li
@@ -136,7 +142,7 @@ const Translator = () => {
 					<div className="w-full flex justify-center relative">
 						<textarea
 							onChange={handleInputChange}
-							className="w-[28rem] h-44 shadow-md rounded-lg px-5 py-2"
+							className="w-[28rem] min-h-44 shadow-md rounded-lg px-5 py-2"
 							value={inputText || ""}
 							onKeyDown={handleKeyDown}
 						/>
@@ -149,6 +155,7 @@ const Translator = () => {
 							<CiCircleChevDown
 								onClick={handleTranslate}
 								style={{ height: "25px", width: "25px" }}
+								className="hover:cursor-pointer hover:scale-110"
 							/>
 						</button>
 					</div>
@@ -156,7 +163,7 @@ const Translator = () => {
 						<textarea
 							readOnly
 							value={translated || ""}
-							className="w-[28rem] flex justify-center h-44 shadow-md rounded-lg px-5 py-2"
+							className="w-[28rem] flex justify-center h-44 shadow-md rounded-lg px-5 py-2 min-h-44"
 						/>
 					</div>
 				</div>
